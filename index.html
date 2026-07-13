@@ -549,7 +549,10 @@ You're not alone, just pick up the phone`,
             songData[artist].forEach(song => {
                 const div = document.createElement('div');
                 div.className = 'group card-bg p-4 rounded-lg border border-white/5 hover:border-[#1DB954] cursor-pointer transition-colors flex items-center justify-center text-center h-16';
-                div.innerHTML = `<span class="text-white font-medium">🎵 ${song.title}</span>`;
+                div.innerHTML = `
+                    <span class="text-white font-bold transition-opacity duration-300 group-hover:opacity-0">🎵 ${song.title}</span>
+                    <span class="absolute text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-4">"${song.desc}"</span>
+                `;
                 div.onclick = () => showLyrics(song.title);
                 list.appendChild(div);
             });
