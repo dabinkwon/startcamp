@@ -117,29 +117,8 @@
 
         <section id="playlists" class="max-w-4xl mx-auto py-16">
             <h2 class="text-2xl font-bold mb-10 text-white border-l-4 border-[#1DB954] pl-4">Theme Playlists</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div class="card-bg p-6 rounded-xl border border-white/5">
-                    <h3 class="text-white font-bold mb-4 border-b border-white/10 pb-2">공부할 때</h3>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li>리도어 - 영원은 그렇듯</li>
-                        <li>하현상 - 등대</li>
-                        <li>최유리 - 바람</li>
-                    </ul>
-                </div>
-                <div class="card-bg p-6 rounded-xl border border-white/5">
-                    <h3 class="text-white font-bold mb-4 border-b border-white/10 pb-2">산책할 때</h3>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li>하현상 - RADIO RADIO</li>
-                        <li>DAY6 - Colors</li>
-                    </ul>
-                </div>
-                <div class="card-bg p-6 rounded-xl border border-white/5">
-                    <h3 class="text-white font-bold mb-4 border-b border-white/10 pb-2">운동할 때</h3>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li>CORTIS - GO!</li>
-                        <li>aespa - Rich Man</li>
-                    </ul>
-                </div>
+            <div id="playlist-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Playlists will be injected here -->
             </div>
         </section>
     </main>
@@ -493,6 +472,67 @@ You're not alone, just pick up the phone`,
             '어떤이의 편지': `시들어 가는 건\n후회 없지는 않겠죠\n절대 쉽지도 않겠죠\n그래도 아름다워\n찬 바람이 부는 거리엔 아무 일도\n나지 않는 떨림이 가득하네요\n난 오늘도 아무 일도 없이 지나가요\n저녁 너머엔 날 기다리는\n그대가 서 있다\n생각하다가\n이만 줄이는 건 너무도 아름다워\n또 다신 오지 않을 날들이여\n한 폭의 그림 같은 모습이여\n눈을 감는 순간에도\n난 그대를 생각하겠소\n끝없이 떨어지고 있는듯한 기분은\n나도 알 수 없는 일이고\n말이 없는 고독이 또\n찾아오는 날일 때\n저녁 너머엔 날 기다리는\n그대가 서 있다\n생각하다가\n한숨을 쉬는 건 그래도 아름다워\n또 다신 오지 않을 날들이여\n한 폭의 그림 같은 모습이여\n눈을 감는 순간에도\n난 그대를 생각하겠소\n누군가는 슬프다고 하겠지만\n절대 그렇지 않은 걸 알기에\n긴 꿈을 꾸는 순간에도\n나는 그댈 떠올리다가`
         };
 
+        const initialPlaylists = {
+            "공부할 때": ["리도어 - 영원은 그렇듯", "하현상 - 등대", "최유리 - 바람"],
+            "산책할 때": ["하현상 - RADIO RADIO", "DAY6 - Colors", "다비치 - 타임캘슐"],
+            "운동할 때": ["CORTIS - GO!", "aespa - Rich Man", "Don Toliver - Lose My Mind"]
+        };
+
+        let playlists = JSON.parse(localStorage.getItem('myPlaylists')) || initialPlaylists;
+
+        function savePlaylists() {
+            localStorage.setItem('myPlaylists', JSON.stringify(playlists));
+            renderPlaylists();
+        }
+
+        function addSong(category, inputId) {
+            const input = document.getElementById(inputId);
+            const song = input.value.trim();
+            if (song) {
+                playlists[category].push(song);
+                input.value = '';
+                savePlaylists();
+            }
+        }
+
+        function deleteSong(category, index) {
+            playlists[category].splice(index, 1);
+            savePlaylists();
+        }
+
+        function renderPlaylists() {
+            const container = document.getElementById('playlist-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            Object.keys(playlists).forEach(category => {
+                const card = document.createElement('div');
+                card.className = 'card-bg p-6 rounded-xl border border-white/5 flex flex-col h-full text-center';
+                
+                let songsHtml = playlists[category].map((song, index) => `
+                    <li class="flex justify-between items-center group text-left">
+                        <span class="truncate pr-2">${song}</span>
+                        <button onclick="deleteSong('${category}', ${index})" class="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 10.707a1 1 0 01-1.414 0L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 011.414-1.414L10 8.586l2.293-2.293a1 1 0 011.414 1.414L11.414 10l2.293 2.293a1 1 0 010 1.414z"/></svg>
+                        </button>
+                    </li>
+                `).join('');
+
+                const inputId = `input-${category.replace(/\s+/g, '-')}`;
+                card.innerHTML = `
+                    <h3 class="text-white font-bold mb-4 border-b border-white/10 pb-2">${category}</h3>
+                    <ul class="space-y-2 text-sm text-gray-400 mb-4 flex-grow text-left">${songsHtml}</ul>
+                    <div class="mt-auto flex gap-2">
+                        <input id="${inputId}" type="text" placeholder="노래 추가..." class="bg-black/20 border border-white/10 rounded px-2 py-1 text-xs w-full outline-none focus:border-[#1DB954]">
+                        <button onclick="addSong('${category}', '${inputId}')" class="text-xs bg-[#1DB954] text-black font-bold px-2 py-1 rounded hover:bg-green-400 transition-colors">+</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderPlaylists();
+
         function showSongs(artist) {
             const container = document.getElementById('song-list-container');
             const artistName = document.getElementById('selected-artist-name');
@@ -554,7 +594,7 @@ You're not alone, just pick up the phone`,
             if (!isExpanded && lines.length > 10) {
                 const partial = lines.slice(0, 10).join('\n');
                 lyricsDiv.innerHTML = `
-                    <div class="whitespace-pre-line">${partial}...</div>
+                    <div class="whitespace-pre-line text-center md:text-left">${partial}...</div>
                     <button onclick="toggleLyrics()" class="mt-3 text-[#1DB954] font-bold text-sm hover:underline">더보기</button>
                 `;
             } else {
@@ -562,7 +602,7 @@ You're not alone, just pick up the phone`,
                 const col1 = lines.slice(0, mid).join('\n');
                 const col2 = lines.slice(mid).join('\n');
                 lyricsDiv.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left">
                         <div class="whitespace-pre-line">${col1}</div>
                         <div class="whitespace-pre-line">${col2}</div>
                     </div>
