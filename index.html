@@ -11,6 +11,16 @@
         .card-bg { background-color: #121212; transition: all 0.3s ease; }
         .card-bg:hover { background-color: #282828; }
         .blur-header { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        #scroll-progress {
+            position: fixed;
+            top: 72px;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background-color: #1DB954;
+            z-index: 60;
+            transition: width 0.1s ease-out;
+        }
     </style>
 </head>
 <body class="text-gray-300">
@@ -24,6 +34,8 @@
         </nav>
     </header>
 
+    <div id="scroll-progress"></div>
+
     <main class="pt-32 pb-16 px-6">
         <header class="text-center py-10">
             <h1 class="text-5xl font-black mb-4 tracking-tighter text-white">SoundTrack</h1>
@@ -32,7 +44,7 @@
 
         <section id="about" class="max-w-4xl mx-auto py-16">
             <h2 class="text-2xl font-bold mb-10 text-white border-l-4 border-[#1DB954] pl-4">About Me</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div class="card-bg p-8 rounded-xl border border-white/5">
                     <h3 class="spotify-green font-bold mb-4 text-lg">가장 많이 듣는 장르</h3>
                     <ul class="space-y-2 text-sm text-gray-400">
@@ -63,19 +75,35 @@
         <section id="muses" class="max-w-4xl mx-auto py-16">
             <h2 class="text-2xl font-bold mb-10 text-white border-l-4 border-[#1DB954] pl-4">My Muses</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="card-container relative group cursor-pointer h-40" onclick="showSongs('최유리')">
-                    <div class="card-bg w-full h-full rounded-xl flex items-center justify-center text-xl font-bold text-white transition-all border border-white/5 hover:border-[#1DB954]">최유리</div>
+                <div class="card-container relative group cursor-pointer h-60 rounded-xl overflow-hidden" onclick="showSongs('최유리')">
+                    <img src="./choi.webp" onerror="this.src='https://placehold.co/400x600/121212/white?text=Choi'" alt="최유리" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <span class="text-white text-xl font-bold">최유리</span>
+                    </div>
                 </div>
-                <div class="card-container relative group cursor-pointer h-40" onclick="showSongs('Henry Moodie')">
-                    <div class="card-bg w-full h-full rounded-xl flex items-center justify-center text-xl font-bold text-white transition-all border border-white/5 hover:border-[#1DB954]">Henry Moodie</div>
+                <div class="card-container relative group cursor-pointer h-60 rounded-xl overflow-hidden" onclick="showSongs('Henry Moodie')">
+                    <img src="./hhe.jpg" onerror="this.src='https://placehold.co/400x600/121212/white?text=Henry'" alt="Henry Moodie" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <span class="text-white text-xl font-bold">Henry Moodie</span>
+                    </div>
                 </div>
-                <div class="card-container relative group cursor-pointer h-40" onclick="showSongs('하현상')">
-                    <div class="card-bg w-full h-full rounded-xl flex items-center justify-center text-xl font-bold text-white transition-all border border-white/5 hover:border-[#1DB954]">하현상</div>
+                <div class="card-container relative group cursor-pointer h-60 rounded-xl overflow-hidden" onclick="showSongs('하현상')">
+                    <img src="./ha.jpg" onerror="this.src='https://placehold.co/400x600/121212/white?text=Ha'" alt="하현상" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <span class="text-white text-xl font-bold">하현상</span>
+                    </div>
                 </div>
             </div>
 
             <div id="song-list-container" class="mt-16 hidden">
-                <h3 id="selected-artist-name" class="text-xl font-bold text-[#1DB954] mb-6"></h3>
+                <div class="flex items-center gap-4 mb-6">
+                    <h3 id="selected-artist-name" class="text-xl font-bold text-[#1DB954]"></h3>
+                    <button id="toggle-list-btn" onclick="toggleSongList()" class="focus:outline-none transform transition-transform duration-300">
+                        <svg id="arrow-icon" class="w-6 h-6 text-[#1DB954]" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5 10l5 5 5-5H5z"/>
+                        </svg>
+                    </button>
+                </div>
                 <div id="song-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
@@ -89,22 +117,19 @@
 
         <section id="playlists" class="max-w-4xl mx-auto py-16">
             <h2 class="text-2xl font-bold mb-10 text-white border-l-4 border-[#1DB954] pl-4">Theme Playlists</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div class="card-bg p-6 rounded-xl border border-white/5">
                     <h3 class="text-white font-bold mb-4 border-b border-white/10 pb-2">공부할 때</h3>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li>리도어 - 영원은 그렇듯</li>
                         <li>하현상 - 등대</li>
                         <li>최유리 - 바람</li>
-                        <li>서자영 - 조용한 기적</li>
                     </ul>
                 </div>
                 <div class="card-bg p-6 rounded-xl border border-white/5">
                     <h3 class="text-white font-bold mb-4 border-b border-white/10 pb-2">산책할 때</h3>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li>하현상 - RADIO RADIO</li>
-                        <li>ASH ISLAND - OST</li>
-                        <li>다비치 - 타임캡슐</li>
                         <li>DAY6 - Colors</li>
                     </ul>
                 </div>
@@ -112,8 +137,6 @@
                     <h3 class="text-white font-bold mb-4 border-b border-white/10 pb-2">운동할 때</h3>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li>CORTIS - GO!</li>
-                        <li>CORTIS - REDRED</li>
-                        <li>Don Toliver - Lose My Mind</li>
                         <li>aespa - Rich Man</li>
                     </ul>
                 </div>
@@ -474,18 +497,19 @@ You're not alone, just pick up the phone`,
             const container = document.getElementById('song-list-container');
             const artistName = document.getElementById('selected-artist-name');
             const list = document.getElementById('song-list');
-            document.getElementById('lyrics-container').classList.add('hidden');
+            const lyricsContainer = document.getElementById('lyrics-container');
 
             artistName.innerText = artist;
             list.innerHTML = '';
+            lyricsContainer.classList.add('hidden');
+            
+            document.getElementById('song-list').classList.remove('hidden');
+            document.getElementById('arrow-icon').style.transform = 'rotate(0deg)';
 
             songData[artist].forEach(song => {
                 const div = document.createElement('div');
                 div.className = 'group card-bg p-4 rounded-lg border border-white/5 hover:border-[#1DB954] cursor-pointer transition-colors flex items-center justify-center text-center h-16';
-                div.innerHTML = `
-                    <span class="text-white font-medium group-hover:hidden block transition-all duration-300">🎵 ${song.title}</span>
-                    <span class="text-[#1DB954] text-sm font-light hidden group-hover:block transition-all duration-300">${song.desc}</span>
-                `;
+                div.innerHTML = `<span class="text-white font-medium">🎵 ${song.title}</span>`;
                 div.onclick = () => showLyrics(song.title);
                 list.appendChild(div);
             });
@@ -494,51 +518,75 @@ You're not alone, just pick up the phone`,
             container.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function showLyrics(songTitle) {
+        function toggleSongList() {
+            const list = document.getElementById('song-list');
+            const arrow = document.getElementById('arrow-icon');
+            const lyricsContainer = document.getElementById('lyrics-container');
+            
+            list.classList.toggle('hidden');
+            
+            if (list.classList.contains('hidden')) {
+                arrow.style.transform = 'rotate(-90deg)';
+                lyricsContainer.classList.add('hidden');
+            } else {
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function showLyrics(title) {
             const container = document.getElementById('lyrics-container');
-            const title = document.getElementById('selected-song-title');
-            const lyricsDiv = document.getElementById('song-lyrics');
-            
             container.classList.remove('hidden');
-            title.innerText = songTitle;
+            document.getElementById('selected-song-title').innerText = title;
             
-            const fullLyrics = lyricsData[songTitle] || "가사 준비 중입니다.";
-            const lines = fullLyrics.split('\n');
-            
-            if (lines.length > 4) {
-                const firstFour = lines.slice(0, 4).join('\n');
+            const lyrics = lyricsData[title] || "가사가 준비되지 않았습니다.";
+            const lyricsDiv = document.getElementById('song-lyrics');
+            lyricsDiv.dataset.fullText = lyrics;
+            lyricsDiv.dataset.expanded = 'false';
+
+            renderLyrics(lyrics, false);
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderLyrics(text, isExpanded) {
+            const lyricsDiv = document.getElementById('song-lyrics');
+            const lines = text.split('\n');
+
+            if (!isExpanded && lines.length > 10) {
+                const partial = lines.slice(0, 10).join('\n');
+                lyricsDiv.innerHTML = `
+                    <div class="whitespace-pre-line">${partial}...</div>
+                    <button onclick="toggleLyrics()" class="mt-3 text-[#1DB954] font-bold text-sm hover:underline">더보기</button>
+                `;
+            } else {
                 const mid = Math.ceil(lines.length / 2);
                 const col1 = lines.slice(0, mid).join('\n');
                 const col2 = lines.slice(mid).join('\n');
-                
                 lyricsDiv.innerHTML = `
-                    <div id="initial-view" class="whitespace-pre-line">${firstFour} ...</div>
-                    <div id="full-view" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 whitespace-pre-line">
-                        <div>${col1}</div>
-                        <div>${col2}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="whitespace-pre-line">${col1}</div>
+                        <div class="whitespace-pre-line">${col2}</div>
                     </div>
-                    <button id="toggle-btn" class="mt-6 text-[#1DB954] text-sm font-bold hover:underline">더 보기</button>
+                    <button onclick="toggleLyrics()" class="mt-3 text-[#1DB954] font-bold text-sm hover:underline">${isExpanded ? '접기' : '더보기'}</button>
                 `;
-                
-                document.getElementById('toggle-btn').onclick = function() {
-                    const initial = document.getElementById('initial-view');
-                    const full = document.getElementById('full-view');
-                    if (full.classList.contains('hidden')) {
-                        initial.classList.add('hidden');
-                        full.classList.remove('hidden');
-                        this.innerText = "접기";
-                    } else {
-                        initial.classList.remove('hidden');
-                        full.classList.add('hidden');
-                        this.innerText = "더 보기";
-                    }
-                };
-            } else {
-                lyricsDiv.innerHTML = `<div class="whitespace-pre-line">${fullLyrics}</div>`;
             }
-            
-            container.scrollIntoView({ behavior: 'smooth' });
         }
+
+        function toggleLyrics() {
+            const lyricsDiv = document.getElementById('song-lyrics');
+            const fullText = lyricsDiv.dataset.fullText;
+            const isExpanded = lyricsDiv.dataset.expanded === 'true';
+
+            const newState = !isExpanded;
+            lyricsDiv.dataset.expanded = newState.toString();
+            renderLyrics(fullText, newState);
+        }
+
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        };
     </script>
 </body>
 </html>
